@@ -1,0 +1,145 @@
+#! /usr/bin/env sh
+
+. /etc/gpm.conf
+
+GPM_check(){
+    if [ ! -d "$GPM_user_settings_encrypted_folder" ]; then
+        mkdir -p "$GPM_user_settings_encrypted_folder" "$GPM_user_settings_recovery_folder" "$GPM_user_settings_mounted_folder"
+        gocryptfs -raw64 -init "$GPM_user_settings_encrypted_folder" | tee "$GPM_user_settings_recovery_folder/gpm.masterkey"
+    fi
+}
+
+GPM_passwd(){
+    gocryptfs -passwd "$GPM_user_settings_encrypted_folder"
+}
+
+GPM_umount(){
+    fusermount -uz "$GPM_user_settings_mounted_folder" 2>/dev/null
+}
+
+GPM_shred(){
+    srm -rf "$GPM_user_settings_encrypted_folder" "$GPM_user_settings_recovery_folder" "$GPM_user_settings_mounted_folder"
+}
+
+GPM_mount(){
+    GPM_check
+    gocryptfs -q "$GPM_user_settings_encrypted_folder" "$GPM_user_settings_mounted_folder"
+}
+
+GPM_add(){
+    if [ -f "$GPM_user_settings_mounted_folder/$1" ]; then
+        echo "Password already stored for the given site."
+        echo "Found at: $GPM_user_settings_mounted_folder/$1"
+    else
+        echo "NAME_user=\"$2\"" > "$GPM_user_settings_mounted_folder/$1"
+        echo "PASS_user=\"$3\"" >> "$GPM_user_settings_mounted_folder/$1"
+    fi
+}
+
+GPM_del(){
+    if [ -f "$GPM_user_settings_mounted_folder/$1" ]; then
+        srm -fv "$GPM_user_settings_mounted_folder/$1"
+    fi
+}
+
+GPM_change(){
+    if [ -f "$GPM_user_settings_mounted_folder/$1" ]; then
+        srm -fv "$GPM_user_settings_mounted_folder/$1"
+    fi
+    if [ -f "$GPM_user_settings_mounted_folder/$1" ]; then
+        echo "Password already stored for the given site."
+        echo "Found at: $GPM_user_settings_mounted_folder/$1"
+    else
+        echo "Found at: $GPM_user_settings_mounted_folder/$1"
+        echo "NAME_user=\"$2\"" > "$GPM_user_settings_mounted_folder/$1"
+        echo "PASS_user=\"$3\"" >> "$GPM_user_settings_mounted_folder/$1"
+    fi
+}
+
+GPM_emit(){
+    if [ -f "$GPM_user_settings_mounted_folder/$1" ]; then
+        echo "Found at: $GPM_user_settings_mounted_folder/$1"
+        cat "$GPM_user_settings_mounted_folder/$1"
+    else
+        echo "Password not found for site."
+    fi
+}
+
+if [ ! -z $1 ]; then
+    echo "$1"
+    if [ "$1" = "-check" ]; then
+        GPM_check
+    fi
+    if [ "$1" = "-init" ]; then
+        GPM_check
+    fi
+    if [ "$1" = "-passwd" ]; then
+        GPM_check
+        GPM_passwd
+    fi
+    if [ "$1" = "-panic" ]; then
+        GPM_umount
+        GPM_shred
+    fi
+    if [ "$1" = "-add" ]; then
+        GPM_mount
+        if [ ! -z $2 ]; then
+            if [ ! -z $3 ]; then
+                if [ ! -z $4 ]; then
+                    GPM_add "$2" "$3" "$4"
+                else
+                    echo "password parameter(4) not found. Leaving password store unaltered."
+                fi
+            else
+                echo "username parameter(3) not found. Leaving password store unaltered."
+            fi
+        else
+            echo "website parameter(2) not found. Leaving password store unaltered."
+        fi
+        GPM_umount
+    fi
+    if [ "$1" = "-del" ]; then
+        GPM_mount
+        if [ ! -z $2 ]; then
+            GPM_del "$2"
+        else
+            echo "website parameter(2) not found. Leaving password store unaltered."
+        fi
+        GPM_umount
+    fi
+    if [ "" = "-change" ]; then
+        GPM_mount
+        if [ ! -z $2 ]; then
+            if [ ! -z $3 ]; then
+                if [ ! -z $4 ]; then
+                    GPM_change "$2" "$3" "$4"
+                else
+                    echo "password parameter(4) not found. Leaving password store unaltered."
+                fi
+            else
+                echo "username parameter(3) not found. Leaving password store unaltered."
+            fi
+        else
+            echo "website parameter(2) not found. Leaving password store unaltered."
+        fi
+        GPM_umount
+    fi
+    if [ "$1" = "-emit" ]; then
+        GPM_mount
+        if [ ! -z $2 ]; then
+            GPM_emit "$2"
+        else
+            echo "website parameter(2) not found. Leaving password store unaltered."
+        fi
+        GPM_umount
+    fi
+    if [ "$1" = "-list" ]; then
+        GPM_mount
+        ls -a "$GPM_user_settings_mounted_folder"
+        GPM_umount
+    fi
+    if [ "-u" = "" ]; then
+        GPM_umount
+    fi
+fi
+
