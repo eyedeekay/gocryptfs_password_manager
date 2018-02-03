@@ -7,10 +7,11 @@ Designed to be used for safer, more convenient scripted logins.
 This is intended for UNIX desktops operated by a single human administrator.
 People who can view the process filesystem, either for your user or in it's
 entirity, are capable of breaking the security of this system by viewing the
-command used to launch a process using these passwords. If at all possible,
-share the secret with another program through environment variables and combine
-with a security module or patchset capable of hiding a user's processes from
-another user.
+command used to launch a process using these passwords. However, the window of
+time that the password is visible is limited to the time it takes for curl to
+complete a single request. If at all possible, share the secret with another
+program through environment variables and combine with a security module or
+patchset capable of hiding a user's processes from another user.
 
 ## usage
 
@@ -57,3 +58,7 @@ will clear the variables containing the password. *Make sure to call this*
         cookieget https://github.com/login
         uzbl https://github.com/ &
         . <(gpm-c)
+
+### more scripts
+
+  * [Skinnydip](https://github.com/eyedeekay/skinnydip)
