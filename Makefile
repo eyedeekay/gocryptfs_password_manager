@@ -17,5 +17,5 @@ deb:
 		--pkgversion=0.1 \
 		--pkglicense=gpl3 \
 		--pakdir=../ \
-		--requires="gocryptfs, bash, srm" \
+		--requires="gocryptfs, bash, secure-delete" \
 		--maintainer="problemsolver@openmailbox.org"
