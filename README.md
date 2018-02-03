@@ -2,6 +2,16 @@
 Dead-simple password manager for users using gocryptfs and normal files.
 Designed to be used for safer, more convenient scripted logins.
 
+## warning:
+
+This is intended for UNIX desktops operated by a single human administrator.
+While the purpose of the cookieget script is to hide passwords from ps and
+/proc/\*/cmdline, it may only be useful for logging in to https websites. Using
+this program without such a wrapper will expose passwords to the process
+filesystem and you will be vulnerable to anyone who can view it in an
+unrestricted fashion. Please consider combining this with a security solution
+which is capable of hiding users processes from eachother.
+
 ## usage
 
         gpm
@@ -41,3 +51,6 @@ will clear the variables containing the password. *Make sure to call this*
 ## example script
 
         #! /usr/bin/env sh
+        . <(gpm -emit github)
+        cookieget https://github.com
+        . <(gpm-c)
