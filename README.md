@@ -5,12 +5,12 @@ Designed to be used for safer, more convenient scripted logins.
 ## warning:
 
 This is intended for UNIX desktops operated by a single human administrator.
-While the purpose of the cookieget script is to hide passwords from ps and
-/proc/\*/cmdline, it may only be useful for logging in to https websites. Using
-this program without such a wrapper will expose passwords to the process
-filesystem and you will be vulnerable to anyone who can view it in an
-unrestricted fashion. Please consider combining this with a security solution
-which is capable of hiding users processes from eachother.
+People who can view the process filesystem, either for your user or in it's
+entirity, are capable of breaking the security of this system by viewing the
+command used to launch a process using these passwords. If at all possible,
+share the secret with another program through environment variables and combine
+with a security module or patchset capable of hiding a user's processes from
+another user.
 
 ## usage
 
@@ -49,6 +49,8 @@ will clear the variables containing the password. *Make sure to call this*
 *before the end of your script*.
 
 ## example script
+
+WIP
 
         #! /usr/bin/env sh
         . <(gpm -emit github)
