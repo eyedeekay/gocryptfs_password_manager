@@ -13,7 +13,8 @@ if [ -f /etc/gpm.conf ]; then
     . /etc/gpm.conf
 fi
 
-curl --cookie "$GPM_user_bin_cookies" --cookie-jar "$GPM_user_bin_cookies" \
+curl -L --cookie "$GPM_user_bin_cookies" --cookie-jar "$GPM_user_bin_cookies" \
+    -H "User-Agent: Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19" \
     -d "$GPM_name_field=$NAME_user" \
     -d "$GPM_pass_field=$PASS_user" \
     $@
