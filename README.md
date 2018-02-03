@@ -25,7 +25,9 @@ another user.
             -change $site username password: Change a password for a specific
                 service.
             -emit $site: Emit a password for a specific service from the store.
+            -file: Show the file containing the requested password.
             -u: Forcibly unmount the encrypted volume.
+            -c: Set the environment variables to blank.
             -panic: Unmount and securely delete all encrypted volumes,
                 mountpoints, and recovery keys.
 

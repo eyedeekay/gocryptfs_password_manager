@@ -151,7 +151,9 @@ if [ ! -z $1 ]; then
     if [ "$1" = "-file" ]; then
         GPM_mount
         if [ ! -z $2 ]; then
-            echo "#Found at: $GPM_user_settings_mounted_folder/$2"
+            if [ -f "$GPM_user_settings_mounted_folder/$2" ]; then
+                echo "$GPM_user_settings_mounted_folder/$2"
+            fi
         else
             echo "website parameter(2) not found. Leaving password store unaltered." 1>&2
         fi
@@ -172,3 +174,4 @@ if [ ! -z $1 ]; then
 fi
 
 set -o history
+GPM_umount
