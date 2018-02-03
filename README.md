@@ -38,3 +38,6 @@ or
 will clear the variables containing the password. *Make sure to call this*
 *before the end of your script*.
 
+## example script
+
+        #! /usr/bin/env sh
