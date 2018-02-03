@@ -1,4 +1,4 @@
-#! /usr/bin/env sh
+#! /usr/bin/env bash
 
 . /etc/gpm.conf
 
@@ -36,7 +36,7 @@ GPM_shred(){
 
 GPM_mount(){
     GPM_check
-    gocryptfs "$GPM_user_uses_password_file" -q "$GPM_user_settings_encrypted_folder" "$GPM_user_settings_mounted_folder" 1>&2
+    gocryptfs $GPM_user_uses_password_file -q "$GPM_user_settings_encrypted_folder" "$GPM_user_settings_mounted_folder" 1>&2
 }
 
 GPM_add(){

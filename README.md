@@ -50,9 +50,9 @@ will clear the variables containing the password. *Make sure to call this*
 
 ## example script
 
-WIP
-
         #! /usr/bin/env sh
         . <(gpm -emit github)
-        cookieget https://github.com
+        cookieget https://github.com/login
+        uzbl https://github.com/ &
         . <(gpm-c)
+
