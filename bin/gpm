@@ -2,15 +2,28 @@
 
 . /etc/gpm.conf
 
+set +o history
+
+GPM_user_uses_password_file=""
+
+if [ -f "$GPM_user_settings_password_file" ]; then
+    GPM_user_uses_password_file="-passfile $GPM_user_settings_password_file"
+fi
+
 GPM_check(){
     if [ ! -d "$GPM_user_settings_encrypted_folder" ]; then
         mkdir -p "$GPM_user_settings_encrypted_folder" "$GPM_user_settings_recovery_folder" "$GPM_user_settings_mounted_folder"
-        gocryptfs -raw64 -init "$GPM_user_settings_encrypted_folder" | tee "$GPM_user_settings_recovery_folder/gpm.masterkey"
+        gocryptfs "$GPM_user_uses_password_file" -raw64 -init "$GPM_user_settings_encrypted_folder" | tee "$GPM_user_settings_recovery_folder/gpm.masterkey"
+        sleep 5
     fi
 }
 
 GPM_passwd(){
-    gocryptfs -passwd "$GPM_user_settings_encrypted_folder"
+    if [ -z $GPM_user_uses_password_file ]; then
+        gocryptfs -passwd "$GPM_user_settings_encrypted_folder"
+    else
+        echo "Cannot change password when using file as password"
+    fi
 }
 
 GPM_umount(){
@@ -23,13 +36,13 @@ GPM_shred(){
 
 GPM_mount(){
     GPM_check
-    gocryptfs -q "$GPM_user_settings_encrypted_folder" "$GPM_user_settings_mounted_folder"
+    gocryptfs "$GPM_user_uses_password_file" -q "$GPM_user_settings_encrypted_folder" "$GPM_user_settings_mounted_folder" 1>&2
 }
 
 GPM_add(){
     if [ -f "$GPM_user_settings_mounted_folder/$1" ]; then
-        echo "Password already stored for the given site."
-        echo "Found at: $GPM_user_settings_mounted_folder/$1"
+        echo "#Password already stored for the given site."  1>&2
+        echo "#Found at: $GPM_user_settings_mounted_folder/$1"  1>&2
     else
         echo "NAME_user=\"$2\"" > "$GPM_user_settings_mounted_folder/$1"
         echo "PASS_user=\"$3\"" >> "$GPM_user_settings_mounted_folder/$1"
@@ -47,26 +60,26 @@ GPM_change(){
         srm -fv "$GPM_user_settings_mounted_folder/$1"
     fi
     if [ -f "$GPM_user_settings_mounted_folder/$1" ]; then
-        echo "Password already stored for the given site."
-        echo "Found at: $GPM_user_settings_mounted_folder/$1"
+        echo "#Password already stored for the given site."  1>&2
+        echo "#Found at: $GPM_user_settings_mounted_folder/$1"  1>&2
     else
-        echo "Found at: $GPM_user_settings_mounted_folder/$1"
-        echo "NAME_user=\"$2\"" > "$GPM_user_settings_mounted_folder/$1"
-        echo "PASS_user=\"$3\"" >> "$GPM_user_settings_mounted_folder/$1"
+        echo "#Found at: $GPM_user_settings_mounted_folder/$1" 1>&2
+        echo "NAME_user=\"$2\";" > "$GPM_user_settings_mounted_folder/$1"
+        echo "PASS_user=\"$3\";" >> "$GPM_user_settings_mounted_folder/$1"
     fi
 }
 
 GPM_emit(){
     if [ -f "$GPM_user_settings_mounted_folder/$1" ]; then
-        echo "Found at: $GPM_user_settings_mounted_folder/$1"
+        echo "#Found at: $GPM_user_settings_mounted_folder/$1" 1>&2
         cat "$GPM_user_settings_mounted_folder/$1"
     else
-        echo "Password not found for site."
+        echo "Password not found for site." 1>&2
     fi
 }
 
 if [ ! -z $1 ]; then
-    echo "$1"
+    echo "$1" 1>&2
     if [ "$1" = "-check" ]; then
         GPM_check
     fi
@@ -86,15 +99,16 @@ if [ ! -z $1 ]; then
         if [ ! -z $2 ]; then
             if [ ! -z $3 ]; then
                 if [ ! -z $4 ]; then
+                    echo "setting password for $2"
                     GPM_add "$2" "$3" "$4"
                 else
-                    echo "password parameter(4) not found. Leaving password store unaltered."
+                    echo "password parameter(4) not found. Leaving password store unaltered." 1>&2
                 fi
             else
-                echo "username parameter(3) not found. Leaving password store unaltered."
+                echo "username parameter(3) not found. Leaving password store unaltered." 1>&2
             fi
         else
-            echo "website parameter(2) not found. Leaving password store unaltered."
+            echo "website parameter(2) not found. Leaving password store unaltered." 1>&2
         fi
         GPM_umount
     fi
@@ -103,24 +117,25 @@ if [ ! -z $1 ]; then
         if [ ! -z $2 ]; then
             GPM_del "$2"
         else
-            echo "website parameter(2) not found. Leaving password store unaltered."
+            echo "website parameter(2) not found. Leaving password store unaltered." 1>&2
         fi
         GPM_umount
     fi
-    if [ "" = "-change" ]; then
+    if [ "$1" = "-change" ]; then
         GPM_mount
         if [ ! -z $2 ]; then
             if [ ! -z $3 ]; then
                 if [ ! -z $4 ]; then
+                    echo "changing password for $2"
                     GPM_change "$2" "$3" "$4"
                 else
-                    echo "password parameter(4) not found. Leaving password store unaltered."
+                    echo "password parameter(4) not found. Leaving password store unaltered." 1>&2
                 fi
             else
-                echo "username parameter(3) not found. Leaving password store unaltered."
+                echo "username parameter(3) not found. Leaving password store unaltered." 1>&2
             fi
         else
-            echo "website parameter(2) not found. Leaving password store unaltered."
+            echo "website parameter(2) not found. Leaving password store unaltered." 1>&2
         fi
         GPM_umount
     fi
@@ -129,7 +144,16 @@ if [ ! -z $1 ]; then
         if [ ! -z $2 ]; then
             GPM_emit "$2"
         else
-            echo "website parameter(2) not found. Leaving password store unaltered."
+            echo "website parameter(2) not found. Leaving password store unaltered." 1>&2
+        fi
+        GPM_umount
+    fi
+    if [ "$1" = "-file" ]; then
+        GPM_mount
+        if [ ! -z $2 ]; then
+            echo "#Found at: $GPM_user_settings_mounted_folder/$2"
+        else
+            echo "website parameter(2) not found. Leaving password store unaltered." 1>&2
         fi
         GPM_umount
     fi
@@ -138,8 +162,13 @@ if [ ! -z $1 ]; then
         ls -a "$GPM_user_settings_mounted_folder"
         GPM_umount
     fi
-    if [ "-u" = "" ]; then
+    if [ "$1" = "-u" ]; then
         GPM_umount
+    fi
+    if [ "$1" = "-c" ]; then
+        echo "NAME_user=\"\""
+        echo "PASS_user=\"\""
     fi
 fi
 
+set -o history

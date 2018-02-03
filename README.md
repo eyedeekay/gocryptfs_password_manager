@@ -19,3 +19,22 @@ Designed to be used for safer, more convenient scripted logins.
             -panic: Unmount and securely delete all encrypted volumes,
                 mountpoints, and recovery keys.
 
+## usage in scripts
+
+        . <(gpm -emit "$site")
+
+or
+
+        . <(gpm-emit "$site")
+
+will source the password into your environment.
+
+        . <(gpm -c)
+
+or
+
+        . <(gpm-c)
+
+will clear the variables containing the password. *Make sure to call this*
+*before the end of your script*.
+
