@@ -1,0 +1,10 @@
+#*
+#!bin/gpm
+#!bin/gpm-emit
+#!bin/gpm-c
+#!bin/github
+#!bin/cookieget
+#!etc/gpm.conf
+#!Makefile
+#!README.md
+

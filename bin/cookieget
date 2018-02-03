@@ -1,0 +1,13 @@
+#! /usr/bin/env sh
+
+GPM_name_field="name"
+GPM_pass_field="pass"
+
+if [ -f /etc/gpm.conf ]; then
+    . /etc/gpm.conf
+fi
+
+curl --cookie "$GPM_user_bin_cookies" --cookie-jar "$GPM_user_bin_cookies" \
+    -d "$GPM_name_field=$NAME_user" \
+    -d "$GPM_pass_field=$PASS_user" \
+    "$1" #2> /dev/null

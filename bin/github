@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+. <(gpm-emit github)
+cookieget https://github.com/login
+"$GPM_user_bin_browser" https://github.com/ &>/dev/null &
+. <(gpm-c)
