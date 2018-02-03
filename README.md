@@ -55,4 +55,3 @@ will clear the variables containing the password. *Make sure to call this*
         cookieget https://github.com/login
         uzbl https://github.com/ &
         . <(gpm-c)
-
