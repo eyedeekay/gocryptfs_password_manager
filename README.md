@@ -32,6 +32,40 @@ patchset capable of hiding a user's processes from another user.
             -panic: Unmount and securely delete all encrypted volumes,
                 mountpoints, and recovery keys.
 
+### examples
+
+**Initialize a passsword store**
+
+        gpm -init
+
+**Change the master password**
+
+        gpm -passwd
+
+**Add a password**
+
+        gpm -add $sitenickname $username $password
+        gpm -add github user pass
+
+**Delete a password**
+
+        gpm -del $sitenickname
+        gpm -del github
+
+**Emit a username and password to stdout(They can be sourced into scripts)**
+
+        gpm -del $sitenickname
+        gpm -del github
+
+**Change a site passsword**
+
+        gpm -change $sitenickname $username $password
+        gpm -change github user pass
+
+**Shred the password store completely(Dangerous)**
+
+        gpm -panic
+
 ## usage in scripts
 
         . <(gpm -emit "$site")
