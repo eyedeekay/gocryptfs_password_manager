@@ -13,7 +13,7 @@ complete a single request. If at all possible, share the secret with another
 program through environment variables and combine with a security module or
 patchset capable of hiding a user's processes from another user.
 
-## usage
+## usage:
 
         gpm
             -check: Make sure that the encrypted folder, mountpoint, and
@@ -32,7 +32,7 @@ patchset capable of hiding a user's processes from another user.
             -panic: Unmount and securely delete all encrypted volumes,
                 mountpoints, and recovery keys.
 
-### examples
+### examples:
 
 **Initialize a passsword store**
 
@@ -66,7 +66,7 @@ patchset capable of hiding a user's processes from another user.
 
         gpm -panic
 
-## usage in scripts
+## usage in scripts:
 
         . <(gpm -emit "$site")
 
@@ -85,7 +85,7 @@ or
 will clear the variables containing the password. *Make sure to call this*
 *before the end of your script*.
 
-## example script
+## example script:
 
         #! /usr/bin/env sh
         . <(gpm -emit github)
@@ -93,6 +93,6 @@ will clear the variables containing the password. *Make sure to call this*
         uzbl https://github.com/ &
         . <(gpm-c)
 
-### more scripts
+### more scripts:
 
   * [Skinnydip](https://github.com/eyedeekay/skinnydip)
